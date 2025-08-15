@@ -10,6 +10,12 @@ A small, production-like payment gateway.
 - Prometheus + Grafana
 - Docker Compose
 
+## Diagram
+
+
+![Payment Gateway Simulator Diagram](img/diagram.svg)
+
+
 ## Structure
 ```
 payment-gateway-simulator/
