@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: pguser
       POSTGRES_PASSWORD: pgpass
-      POSTGRES_DB: pgw
+      POSTGRES_DB: pguser
     ports:
       - "5432:5432"
     volumes:
@@ -33,7 +33,7 @@ services:
     environment:
       API_PORT: 3000
       API_METRICS_PORT: 2112
-      POSTGRES_DSN: postgres://pguser:pgpass@postgres:5432/pgw?sslmode=disable
+      POSTGRES_DSN: postgres://pguser:pgpass@postgres:5432/pguser?sslmode=disable
       REDIS_ADDR: redis:6379
       NATS_URL: nats://nats:4222
       NATS_SUBJECT: payments.created
@@ -55,7 +55,7 @@ services:
       dockerfile: ./cmd/processor/Dockerfile
     environment:
       PROCESSOR_METRICS_PORT: 2113
-      POSTGRES_DSN: postgres://pguser:pgpass@postgres:5432/pgw?sslmode=disable
+      POSTGRES_DSN: postgres://pguser:pgpass@postgres:5432/pguser?sslmode=disable
       REDIS_ADDR: redis:6379
       NATS_URL: nats://nats:4222
       NATS_SUBJECT: payments.created
