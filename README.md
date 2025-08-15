@@ -1,6 +1,6 @@
 # Payment Gateway Simulator (GoFiber + sqlx)
 
-A small, production-like payment gateway to demo at VNPay interviews.
+A small, production-like payment gateway.
 
 ## Stack
 - Go 1.22, GoFiber
@@ -10,47 +10,30 @@ A small, production-like payment gateway to demo at VNPay interviews.
 - Prometheus + Grafana
 - Docker Compose
 
-## Architecture
-```mermaid
-flowchart LR
-    subgraph Client
-      M[Merchant]
-    end
-    subgraph API[API Service]
-      R1[POST /payments]
-Validate Signature
-Save pending
-Publish NATS
-      R2[GET /payments/:id]
-Check Redis -> DB
-    end
-
-    subgraph Queue
-      N[NATS: payments.created]
-    end
-
-    subgraph Processor[Processor Service]
-      P[Consume -> Simulate bank
-Update DB + Redis]
-    end
-
-    DB[(PostgreSQL)]
-    C[(Redis)]
-    PM[Prometheus]
-    GF[Grafana]
-
-    M --> R1 --> N --> P --> DB
-    P --> C
-    R2 --> C
-    R2 --> DB
-    API-->PM
-    Processor-->PM
-    PM-->GF
+## Structure
 ```
+payment-gateway-simulator/
+├── cmd/
+│   ├── api/          # API Service (GoFiber)
+│   │   └── main.go
+│   └── processor/    # Processor Service (NATS consumer)
+│       └── main.go
+├── internal/
+│   ├── config/       # Load env
+│   ├── db/           # sqlx connect
+│   ├── cache/        # Redis client
+│   ├── queue/        # NATS connect
+│   └── payment/      # model + repository + service
+├── deployments/postgres/init.sql
+├── docker-compose.yml
+├── prometheus.yml
+├── .env.example
+└── README.md 
 
+```
 ## Run
 ```bash
-cp .env.example .env   # optional, compose sets sane defaults
+cp .env.example .env   
 docker compose up --build -d
 ```
 
