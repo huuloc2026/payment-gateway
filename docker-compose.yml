@@ -1,0 +1,85 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: pgw
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./deployments/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pguser"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  nats:
+    image: nats:2-alpine
+    ports:
+      - "4222:4222"
+
+  api:
+    build:
+      context: .
+      dockerfile: ./cmd/api/Dockerfile
+    environment:
+      API_PORT: 3000
+      API_METRICS_PORT: 2112
+      POSTGRES_DSN: postgres://pguser:pgpass@postgres:5432/pgw?sslmode=disable
+      REDIS_ADDR: redis:6379
+      NATS_URL: nats://nats:4222
+      NATS_SUBJECT: payments.created
+      HMAC_SECRET: supersecret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_started
+    ports:
+      - "3000:3000"
+      - "2112:2112"
+
+  processor:
+    build:
+      context: .
+      dockerfile: ./cmd/processor/Dockerfile
+    environment:
+      PROCESSOR_METRICS_PORT: 2113
+      POSTGRES_DSN: postgres://pguser:pgpass@postgres:5432/pgw?sslmode=disable
+      REDIS_ADDR: redis:6379
+      NATS_URL: nats://nats:4222
+      NATS_SUBJECT: payments.created
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - processor
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
