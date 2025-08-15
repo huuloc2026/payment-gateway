@@ -1,4 +1,4 @@
-module github.com/yourname/payment-gateway-simulator
+module github.com/huuloc2026/payment-gateway-simulator
 
 go 1.22.0
 

@@ -15,11 +15,11 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 
-	"github.com/yourname/payment-gateway-simulator/internal/cache"
-	"github.com/yourname/payment-gateway-simulator/internal/config"
-	"github.com/yourname/payment-gateway-simulator/internal/db"
-	"github.com/yourname/payment-gateway-simulator/internal/payment"
-	"github.com/yourname/payment-gateway-simulator/internal/queue"
+	"github.com/huuloc2026/payment-gateway-simulator/internal/cache"
+	"github.com/huuloc2026/payment-gateway-simulator/internal/config"
+	"github.com/huuloc2026/payment-gateway-simulator/internal/db"
+	"github.com/huuloc2026/payment-gateway-simulator/internal/payment"
+	"github.com/huuloc2026/payment-gateway-simulator/internal/queue"
 )
 
 func main() {
